@@ -12,6 +12,7 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(express.static("public"));
+mongoose.Promise = Promise;
 
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/views/index.html");
@@ -46,13 +47,19 @@ app.post("/api/exercise/new-user", (req, res) => {
 });
 
 app.post("/api/exercise/add", (req, res) => {
-  UserModel.findOne({ username: req.body.userId }).exec((err, data) => {
-    if (data) {
-      
-    } else {
-      res.status(400).send("unknown _id");
-    }
-  });
+  UserModel.findOne({ username: req.body.userId })
+    .catch(err => console.log(err))
+    .then(data => {
+      if (data) {
+        UserModel.findOne({ description: req.body.userId })
+          .catch(err => console.log(err))
+          .then(data => {
+          
+        });
+      } else {
+        res.status(400).send("unknown _id");
+      }
+    });
 });
 
 // Not found middleware
