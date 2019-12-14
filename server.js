@@ -58,14 +58,13 @@ const ExerciseSchema = new mongoose.Schema({
 const ExerciseModel = mongoose.model("ExerciseModel", ExerciseSchema);
 
 app.post("/api/exercise/new-user", (req, res) => {
-  UserModel.findOne({username:req.body.username}, (err, data)=>{
-    if(err) console.log(err);
-    if(data) {
-      res.json({})
-    }else{
-      
+  UserModel.findOne({ username: req.body.username }, (err, data) => {
+    if (err) console.log(err);
+    if (data) {
+      //res.status(400).send("username already taken");
+    } else {
     }
-  })
+  });
 });
 
 const listener = app.listen(process.env.PORT || 3000, () => {
