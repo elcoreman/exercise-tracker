@@ -53,6 +53,9 @@ app.post("/api/exercise/add", (req, res) => {
       if (!data) res.status(400).send("unknown _id");
       if (!req.body.duration) res.status(400).send("unknown duration");
       if (!req.body.duration) res.status(400).send("unknown description");
+      return data;
+    })
+    .then(data => {
       UserModel.create({
         username: req.body.username,
         description: req.body.description,
