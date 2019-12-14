@@ -46,15 +46,11 @@ app.post("/api/exercise/new-user", (req, res) => {
 });
 
 app.post("/api/exercise/add", (req, res) => {
-  UserModel.findOne({ username: req.body.username }, (err, data) => {
-    if (err) console.log(err);
+  UserModel.findOne({ username: req.body.userId }).exec((err, data) => {
     if (data) {
-      res.status(400).send("username already taken");
+      
     } else {
-      UserModel.create({ username: req.body.username }, (err, data) => {
-        if (err) console.log(err);
-        res.json({ username: data.username, _id: data._id });
-      });
+      res.status(400).send("unknown _id");
     }
   });
 });
