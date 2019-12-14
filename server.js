@@ -50,20 +50,18 @@ app.post("/api/exercise/add", (req, res) => {
   UserModel.findOne({ username: req.body.userId })
     .catch(err => console.log(err))
     .then(data => {
+    console.log(data);
       if (!data) res.status(400).send("unknown _id");
       if (!req.body.duration) res.status(400).send("unknown duration");
       if (!req.body.duration) res.status(400).send("unknown description");
-      return data;
-    })
-    .then(data => {
-      UserModel.create({
+      return UserModel.create({
         username: req.body.username,
         description: req.body.description,
         duration: req.body.duration
-      })
-        .catch(err => console.log(err))
-        .then(data => {});
-    });
+      });
+    })
+    .catch(err => console.log(err))
+    .then(data => {res.json({data})});
 });
 
 // Not found middleware
