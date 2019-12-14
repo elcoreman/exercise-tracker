@@ -19,7 +19,7 @@ app.get("/", (req, res) => {
 
 const UserSchema = new mongoose.Schema({
   username: String,
-  id: shortid.generate
+  _id: { type: String, default: shortid.generate }
 });
 const UserModel = mongoose.model("UserModel", UserSchema);
 
@@ -32,6 +32,20 @@ const ExerciseSchema = new mongoose.Schema({
 const ExerciseModel = mongoose.model("ExerciseModel", ExerciseSchema);
 
 app.post("/api/exercise/new-user", (req, res) => {
+  UserModel.findOne({ username: req.body.username }, (err, data) => {
+    if (err) console.log(err);
+    if (data) {
+      res.status(400).send("username already taken");
+    } else {
+      UserModel.create({ username: req.body.username }, (err, data) => {
+        if (err) console.log(err);
+        res.json({ username: data.username, _id: data._id });
+      });
+    }
+  });
+});
+
+app.post("/api/exercise/add", (req, res) => {
   UserModel.findOne({ username: req.body.username }, (err, data) => {
     if (err) console.log(err);
     if (data) {
