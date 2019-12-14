@@ -27,7 +27,8 @@ const ExerciseSchema = new mongoose.Schema({
   username: String,
   description: String,
   duration: Number,
-  date: String
+  date: String,
+  _id: { type: String, default: shortid.generate }
 });
 const ExerciseModel = mongoose.model("ExerciseModel", ExerciseSchema);
 
@@ -55,7 +56,8 @@ app.post("/api/exercise/add", (req, res) => {
         username: req.body.username,
         description: req.body.description,
         duration: req.body.duration,
-        date: new Date(req.body.date).toDateString() || new Date().toDateString()
+        date:
+          new Date(req.body.date).toDateString() || new Date().toDateString()
       });
     })
     .then(data => {
@@ -69,6 +71,8 @@ app.post("/api/exercise/add", (req, res) => {
     })
     .catch(err => res.status(500).json({ error: err }));
 });
+
+app.get("/api/exercise/log", (req, res) => {});
 
 // Not found middleware
 app.use((req, res, next) => {
