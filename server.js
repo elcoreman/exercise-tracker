@@ -45,18 +45,6 @@ app.post("/api/exercise/new-user", (req, res) => {
   });
 });
 
-/*app.post("/api/exercise/add", (req, res) => {
-  UserModel.findOne({ _id: req.body.userId })
-    .exec((err, data) => {
-      if (err) console.log(err);
-      console.log(data);
-      return data;
-    })
-    .then(data => {
-      console.log(data);
-    });
-});*/
-
 app.post("/api/exercise/add", (req, res) => {
   UserModel.findOne({ _id: req.body.userId })
     .then(data => {
@@ -67,11 +55,18 @@ app.post("/api/exercise/add", (req, res) => {
       return UserModel.create({
         username: req.body.username,
         description: req.body.description,
-        duration: req.body.duration
+        duration: req.body.duration,
+        date: req.body.date || New Date().now().toString()
       });
     })
     .then(data => {
-      res.json({ data });
+      res.json({
+        username: data.username,
+        description: data.description,
+        duration: data.duration,
+        _id: data._id,
+        date: data.date
+      });
     })
     .catch(err => res.status(500).json({ error: err }));
 });
