@@ -12,7 +12,6 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(express.static("public"));
-mongoose.Promise = Promise;
 
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/views/index.html");
@@ -46,11 +45,22 @@ app.post("/api/exercise/new-user", (req, res) => {
   });
 });
 
-app.post("/api/exercise/add", (req, res) => {
-  UserModel.findOne({ username: req.body.userId })
-    .catch(err => console.log(err))
+/*app.post("/api/exercise/add", (req, res) => {
+  UserModel.findOne({ _id: req.body.userId })
+    .exec((err, data) => {
+      if (err) console.log(err);
+      console.log(data);
+      return data;
+    })
     .then(data => {
-    console.log(data);
+      console.log(data);
+    });
+});*/
+
+app.post("/api/exercise/add", (req, res) => {
+  UserModel.findOne({ _id: req.body.userId })
+    .then(data => {
+      console.log(data);
       if (!data) res.status(400).send("unknown _id");
       if (!req.body.duration) res.status(400).send("unknown duration");
       if (!req.body.duration) res.status(400).send("unknown description");
@@ -60,8 +70,10 @@ app.post("/api/exercise/add", (req, res) => {
         duration: req.body.duration
       });
     })
-    .catch(err => console.log(err))
-    .then(data => {res.json({data})});
+    .then(data => {
+      res.json({ data });
+    })
+    .catch(err => res.status(500).json({ error: err }));
 });
 
 // Not found middleware
