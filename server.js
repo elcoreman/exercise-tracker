@@ -43,8 +43,29 @@ app.use((err, req, res, next) => {
     .send(errMessage);
 });
 
-app.post("/api/exercise/new-user", (req,res)=>{
-  
+mongoose.connect(process.env.MONGOLAB_URI, { useNewUrlParser: true });
+const UserSchema = new mongoose.Schema({
+  username: String
+});
+const UserModel = mongoose.model("UserModel", UserSchema);
+
+const ExerciseSchema = new mongoose.Schema({
+  username: String,
+  description: String,
+  duration: Number,
+  date: String
+});
+const ExerciseModel = mongoose.model("ExerciseModel", ExerciseSchema);
+
+app.post("/api/exercise/new-user", (req, res) => {
+  UserModel.findOne({username:req.body.username}, (err, data)=>{
+    if(err) console.log(err);
+    if(data) {
+      res.json({})
+    }else{
+      
+    }
+  })
 });
 
 const listener = app.listen(process.env.PORT || 3000, () => {
