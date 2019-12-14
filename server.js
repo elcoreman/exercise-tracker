@@ -50,15 +50,16 @@ app.post("/api/exercise/add", (req, res) => {
   UserModel.findOne({ username: req.body.userId })
     .catch(err => console.log(err))
     .then(data => {
-      if (data) {
-        UserModel.findOne({ description: req.body.userId })
-          .catch(err => console.log(err))
-          .then(data => {
-          
-        });
-      } else {
-        res.status(400).send("unknown _id");
-      }
+      if (!data) res.status(400).send("unknown _id");
+      if (!req.body.duration) res.status(400).send("unknown duration");
+      if (!req.body.duration) res.status(400).send("unknown description");
+      UserModel.create({
+        username: req.body.username,
+        description: req.body.description,
+        duration: req.body.duration
+      })
+        .catch(err => console.log(err))
+        .then(data => {});
     });
 });
 
