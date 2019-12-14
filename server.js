@@ -3,6 +3,7 @@ const app = express();
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const mongoose = require("mongoose");
+const shortid = require("shortid");
 
 mongoose.connect(process.env.MLAB_URI, { useNewUrlParser: true });
 console.log("mongoose connection readyState", mongoose.connection.readyState);
@@ -16,10 +17,9 @@ app.get("/", (req, res) => {
   res.sendFile(__dirname + "/views/index.html");
 });
 
-
-
 const UserSchema = new mongoose.Schema({
-  username: String
+  username: String,
+  id: shortid.generate
 });
 const UserModel = mongoose.model("UserModel", UserSchema);
 
@@ -37,11 +37,13 @@ app.post("/api/exercise/new-user", (req, res) => {
     if (data) {
       res.status(400).send("username already taken");
     } else {
-      UserModel.create({username});
+      UserModel.create({ username: req.body.username }, (err, data) => {
+        if (err) console.log(err);
+        res.json({ username: data.username, _id: data._id });
+      });
     }
   });
 });
-
 
 // Not found middleware
 app.use((req, res, next) => {
