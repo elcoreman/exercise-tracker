@@ -1,18 +1,16 @@
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
-
 const cors = require("cors");
-
 const mongoose = require("mongoose");
-mongoose.connect(process.env.MLAB_URI || "mongodb://localhost/exercise-track");
+
+mongoose.connect(process.env.MLAB_URI, { useNewUrlParser: true });
 
 app.use(cors());
-
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-
 app.use(express.static("public"));
+
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/views/index.html");
 });
@@ -43,7 +41,6 @@ app.use((err, req, res, next) => {
     .send(errMessage);
 });
 
-mongoose.connect(process.env.MONGOLAB_URI, { useNewUrlParser: true });
 const UserSchema = new mongoose.Schema({
   username: String
 });
@@ -60,10 +57,11 @@ const ExerciseModel = mongoose.model("ExerciseModel", ExerciseSchema);
 app.post("/api/exercise/new-user", (req, res) => {
   UserModel.findOne({ username: req.body.username }, (err, data) => {
     if (err) console.log(err);
+    console.log(data);
     if (data) {
-      //res.status(400).send("username already taken");
+      res.status(400).send("username already taken");
     } else {
-      
+      res.status(400).send("username already taken111");
     }
   });
 });
