@@ -63,6 +63,7 @@ app.post("/api/exercise/new-user", (req, res) => {
     if (data) {
       //res.status(400).send("username already taken");
     } else {
+      
     }
   });
 });
