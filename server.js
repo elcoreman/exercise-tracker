@@ -48,15 +48,14 @@ app.post("/api/exercise/new-user", (req, res) => {
 app.post("/api/exercise/add", (req, res) => {
   UserModel.findOne({ _id: req.body.userId })
     .then(data => {
-      console.log(data);
       if (!data) res.status(400).send("unknown _id");
       if (!req.body.duration) res.status(400).send("unknown duration");
       if (!req.body.duration) res.status(400).send("unknown description");
-      return UserModel.create({
+      return ExerciseModel.create({
         username: req.body.username,
         description: req.body.description,
         duration: req.body.duration,
-        date: req.body.date || new Date().toDateString()
+        date: new Date(req.body.date).toDateString() || new Date().toDateString()
       });
     })
     .then(data => {
