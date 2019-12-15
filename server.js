@@ -24,11 +24,11 @@ const UserSchema = new mongoose.Schema({
 const UserModel = mongoose.model("UserModel", UserSchema);
 
 const ExerciseSchema = new mongoose.Schema({
-  username: String,
   description: String,
   duration: Number,
   date: String,
-  _id: String
+  userid: String,
+  _id: { type: String, default: shortid.generate }
 });
 const ExerciseModel = mongoose.model("ExerciseModel", ExerciseSchema);
 
@@ -48,26 +48,29 @@ app.post("/api/exercise/new-user", (req, res) => {
 
 app.post("/api/exercise/add", (req, res) => {
   UserModel.findOne({ _id: req.body.userId })
-    .then(data => {
-      if (!data) res.status(400).send("unknown _id");
+    .then(user => {
+      if (!user) res.status(400).send("unknown _id");
       if (!req.body.duration) res.status(400).send("unknown duration");
       if (!req.body.duration) res.status(400).send("unknown description");
-      return ExerciseModel.create({
-        _id: req.body.userId,
-        username: data.username,
-        description: req.body.description,
-        duration: req.body.duration,
-        date:
-          new Date(req.body.date).toDateString() || new Date().toDateString()
-      });
+      return (
+        user,
+        ExerciseModel.create({
+          userid: req.body.userId,
+          description: req.body.description,
+          duration: req.body.duration,
+          date: req.body.date
+            ? new Date(req.body.date).toDateString()
+            : new Date().toDateString()
+        })
+      );
     })
-    .then(data => {
+    .then((user, exercise) => {
       res.json({
-        username: data.username,
-        description: data.description,
-        duration: data.duration,
-        _id: data._id,
-        date: data.date
+        username: user.username,
+        description: exercise.description,
+        duration: exercise.duration,
+        _id: user._id,
+        date: exercise.date
       });
     })
     .catch(err => res.status(500).json({ error: err }));
@@ -85,10 +88,14 @@ app.get("/api/exercise/log", (req, res) => {
     .then(data => {
       return (
         { _id: req.query.userId, username: data.username },
-        ExerciseModel.findById(req.query.userId)
+        ExerciseModel.findById(req.query.userId, "description duration date")
       );
     })
-    .then((uData, eData) => {})
+    .then((data, eData) => {
+      data.count = eData.length;
+      data.log = eData;
+      res.json(data);
+    })
     .catch(err => res.status(500).json({ error: err }));
 });
 
