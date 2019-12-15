@@ -28,7 +28,7 @@ const ExerciseSchema = new mongoose.Schema({
   description: String,
   duration: Number,
   date: String,
-  _id: { type: String, default: shortid.generate }
+  _id: String
 });
 const ExerciseModel = mongoose.model("ExerciseModel", ExerciseSchema);
 
@@ -53,7 +53,8 @@ app.post("/api/exercise/add", (req, res) => {
       if (!req.body.duration) res.status(400).send("unknown duration");
       if (!req.body.duration) res.status(400).send("unknown description");
       return ExerciseModel.create({
-        username: req.body.username,
+        _id: req.body.userId,
+        username: data.username,
         description: req.body.description,
         duration: req.body.duration,
         date:
@@ -73,12 +74,15 @@ app.post("/api/exercise/add", (req, res) => {
 });
 
 app.get("/api/exercise/users", (req, res) => {
-  
+  UserModel.find()
+    .then(data => res.json(data))
+    .catch(err => res.status(500).json({ error: err }));
 });
-/*app.get("/api/exercise/log", (req, res) => {
-  if(!req.query.userId) res.status(400).send("unknown userId");
-  
-});*/
+
+app.get("/api/exercise/log", (req, res) => {
+  if (!req.query.userId) res.status(400).send("unknown userId");
+  res.json()
+});
 
 // Not found middleware
 app.use((req, res, next) => {
