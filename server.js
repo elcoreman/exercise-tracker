@@ -86,9 +86,12 @@ app.get("/api/exercise/log", (req, res) => {
   if (!req.query.userId) res.status(400).send("unknown userId");
   UserModel.findOne({ _id: req.query.userId })
     .then(user => {
-      Promise.all([
+      return Promise.all([
         { _id: req.query.userId, username: user.username },
-        ExerciseModel.findById(req.query.userId, "description duration date")
+        ExerciseModel.find(
+          { userid: req.query.userId },
+          "-_id description duration date"
+        )
       ]);
     })
     .then(([data, exercise]) => {
