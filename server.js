@@ -45,29 +45,33 @@ app.post("/api/exercise/new-user", (req, res) => {
 });
 
 app.post("/api/exercise/add", (req, res) => {
+  var user;
   UserModel.findOne({ _id: req.body.userId })
     .then(user => {
       if (!user) res.status(400).send("unknown _id");
       if (!req.body.duration) res.status(400).send("unknown duration");
       if (!req.body.duration) res.status(400).send("unknown description");
-      return ExerciseModel.create({
-        userid: req.body.userId,
-        description: req.body.description,
-        duration: req.body.duration,
-        date: req.body.date
-          ? new Date(req.body.date).toDateString()
-          : new Date().toDateString()
-      }).;
+      user = user;
+      return Promise.all([
+        user,
+        ExerciseModel.create({
+          userid: req.body.userId,
+          description: req.body.description,
+          duration: req.body.duration,
+          date: req.body.date
+            ? new Date(req.body.date).toDateString()
+            : new Date().toDateString()
+        })
+      ]);
     })
-    .then(({ user, exercise }) => {
-      console.log(user, exercise);
-      /*res.json({
+    .then(([user, exercise]) => {
+      res.json({
         username: user.username,
         description: exercise.description,
         duration: exercise.duration,
         _id: user._id,
         date: exercise.date
-      });*/
+      });
     })
     .catch(err => res.status(500).json({ error: err }));
 });
