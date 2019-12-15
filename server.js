@@ -51,16 +51,14 @@ app.post("/api/exercise/add", (req, res) => {
       if (!user) res.status(400).send("unknown _id");
       if (!req.body.duration) res.status(400).send("unknown duration");
       if (!req.body.duration) res.status(400).send("unknown description");
-      user = user;
+      user = user; //
       return Promise.all([
         user,
         ExerciseModel.create({
           userid: req.body.userId,
           description: req.body.description,
           duration: req.body.duration,
-          date: req.body.date
-            ? new Date(req.body.date).toDateString()
-            : new Date().toDateString()
+          date: req.body.date ? new Date(req.body.date) : new Date()
         })
       ]);
     })
@@ -70,7 +68,7 @@ app.post("/api/exercise/add", (req, res) => {
         description: exercise.description,
         duration: exercise.duration,
         _id: user._id,
-        date: exercise.date
+        date: exercise.date.toDateString()
       });
     })
     .catch(err => res.status(500).json({ error: err }));
@@ -86,15 +84,14 @@ app.get("/api/exercise/log", (req, res) => {
   if (!req.query.userId) res.status(400).send("unknown userId");
   UserModel.findOne({ _id: req.query.userId })
     .then(user => {
-    let query={};
-    query.userid = req.query.userId;
-    
-    if(req.query.from || req.query.from) {
-      query.date = {}
-      if(req.query.from) query.date
-    }
-      
-      date = airedAt: { $gte: '1987-10-19', $lte: '1987-10-26' }
+      let query = {};
+      query.userid = req.query.userId;
+      if (req.query.from || req.query.to) {
+        query.date = {};
+        if (req.query.from) query.date.$gte = req.query.from;
+        if (req.query.to) query.date.$lte = req.query.to;
+      }
+      console.log(query);
       return Promise.all([
         { _id: req.query.userId, username: user.username },
         ExerciseModel.find(query)
