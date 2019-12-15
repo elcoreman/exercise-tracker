@@ -96,6 +96,7 @@ app.get("/api/exercise/log", (req, res) => {
         { _id: req.query.userId, username: user.username },
         ExerciseModel.find(query)
           .select("-_id description duration date")
+          .sort({ date: query.date ? 1 : 0 })
           .limit(Number(req.query.limit) ? Number(req.query.limit) : 0)
       ]);
     })
