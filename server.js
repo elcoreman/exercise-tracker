@@ -33,17 +33,15 @@ const ExerciseSchema = new mongoose.Schema({
 const ExerciseModel = mongoose.model("ExerciseModel", ExerciseSchema);
 
 app.post("/api/exercise/new-user", (req, res) => {
-  UserModel.findOne({ username: req.body.username }, (err, data) => {
-    if (err) console.log(err);
-    if (data) {
-      res.status(400).send("username already taken");
-    } else {
-      UserModel.create({ username: req.body.username }, (err, data) => {
-        if (err) console.log(err);
-        res.json({ username: data.username, _id: data._id });
-      });
-    }
-  });
+  UserModel.findOne({ username: req.body.username })
+    .then(user => {
+      if (user) res.status(400).send("username already taken");
+      return UserModel.create({ username: req.body.username });
+    })
+    .then(user => {
+      res.json({ username: user.username, _id: user._id });
+    })
+    .catch(err => res.status(500).json({ error: err }));
 });
 
 app.post("/api/exercise/add", (req, res) => {
@@ -53,7 +51,7 @@ app.post("/api/exercise/add", (req, res) => {
       if (!req.body.duration) res.status(400).send("unknown duration");
       if (!req.body.duration) res.status(400).send("unknown description");
       return (
-        user,
+        //user,
         ExerciseModel.create({
           userid: req.body.userId,
           description: req.body.description,
@@ -64,36 +62,37 @@ app.post("/api/exercise/add", (req, res) => {
         })
       );
     })
-    .then((user, exercise) => {
-      res.json({
+    .then((/*user, */exercise) => {
+    console.log(/*user,*/exercise);
+      /*res.json({
         username: user.username,
         description: exercise.description,
         duration: exercise.duration,
         _id: user._id,
         date: exercise.date
-      });
+      });*/
     })
     .catch(err => res.status(500).json({ error: err }));
 });
 
 app.get("/api/exercise/users", (req, res) => {
   UserModel.find()
-    .then(data => res.json(data))
+    .then(user => res.json(user))
     .catch(err => res.status(500).json({ error: err }));
 });
 
 app.get("/api/exercise/log", (req, res) => {
   if (!req.query.userId) res.status(400).send("unknown userId");
   UserModel.findOne({ _id: req.query.userId })
-    .then(data => {
+    .then(user => {
       return (
-        { _id: req.query.userId, username: data.username },
+        { _id: req.query.userId, username: user.username },
         ExerciseModel.findById(req.query.userId, "description duration date")
       );
     })
-    .then((data, eData) => {
-      data.count = eData.length;
-      data.log = eData;
+    .then((data, exercise) => {
+      data.count = exercise.length;
+      data.log = exercise;
       res.json(data);
     })
     .catch(err => res.status(500).json({ error: err }));
