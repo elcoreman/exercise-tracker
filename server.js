@@ -81,7 +81,15 @@ app.get("/api/exercise/users", (req, res) => {
 
 app.get("/api/exercise/log", (req, res) => {
   if (!req.query.userId) res.status(400).send("unknown userId");
-  res.json()
+  UserModel.findOne({ _id: req.query.userId })
+    .then(data => {
+      return (
+        { _id: req.query.userId, username: data.username },
+        ExerciseModel.findById(req.query.userId)
+      );
+    })
+    .then((uData, eData) => {})
+    .catch(err => res.status(500).json({ error: err }));
 });
 
 // Not found middleware
