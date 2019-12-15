@@ -50,20 +50,17 @@ app.post("/api/exercise/add", (req, res) => {
       if (!user) res.status(400).send("unknown _id");
       if (!req.body.duration) res.status(400).send("unknown duration");
       if (!req.body.duration) res.status(400).send("unknown description");
-      return (
-        //user,
-        ExerciseModel.create({
-          userid: req.body.userId,
-          description: req.body.description,
-          duration: req.body.duration,
-          date: req.body.date
-            ? new Date(req.body.date).toDateString()
-            : new Date().toDateString()
-        })
-      );
+      return ExerciseModel.create({
+        userid: req.body.userId,
+        description: req.body.description,
+        duration: req.body.duration,
+        date: req.body.date
+          ? new Date(req.body.date).toDateString()
+          : new Date().toDateString()
+      }).;
     })
-    .then((/*user, */exercise) => {
-    console.log(/*user,*/exercise);
+    .then(({ user, exercise }) => {
+      console.log(user, exercise);
       /*res.json({
         username: user.username,
         description: exercise.description,
