@@ -72,7 +72,9 @@ app.post("/api/exercise/add", (req, res) => {
     .catch(err => res.status(500).json({ error: err }));
 });
 
-app.get("/api/exercise/log", (req, res) => {});
+app.get("/api/exercise/log", (req, res) => {
+  console.log(req.query.userId);
+});
 
 // Not found middleware
 app.use((req, res, next) => {
