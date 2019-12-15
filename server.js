@@ -73,7 +73,8 @@ app.post("/api/exercise/add", (req, res) => {
 });
 
 app.get("/api/exercise/log", (req, res) => {
-  console.log(req.query.userId);
+  if(!req.query.userId) res.status(400).send("unknown userId");
+  
 });
 
 // Not found middleware
