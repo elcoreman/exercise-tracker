@@ -19,7 +19,7 @@ app.get("/", (req, res) => {
 
 const UserSchema = new mongoose.Schema({
   username: String,
-  _id: { type: String, default: shortid.generate }
+  _id: { type: String, unique: true, default: shortid.generate }
 });
 const UserModel = mongoose.model("UserModel", UserSchema);
 
@@ -28,7 +28,7 @@ const ExerciseSchema = new mongoose.Schema({
   duration: Number,
   date: Date,
   userid: String,
-  _id: { type: String, default: shortid.generate }
+  _id: { type: String, unique: true, default: shortid.generate }
 });
 const ExerciseModel = mongoose.model("ExerciseModel", ExerciseSchema);
 
@@ -88,8 +88,8 @@ app.get("/api/exercise/log", (req, res) => {
       query.userid = req.query.userId;
       if (req.query.from || req.query.to) {
         query.date = {};
-        if (req.query.from) query.date.$gte = req.query.from;
-        if (req.query.to) query.date.$lte = req.query.to;
+        if (req.query.from) query.date.$gte = new Date(req.query.from);
+        if (req.query.to) query.date.$lte = new Date(req.query.to);
       }
       console.log(query);
       return Promise.all([
@@ -102,7 +102,7 @@ app.get("/api/exercise/log", (req, res) => {
     })
     .then(([data, exercise]) => {
       data.count = exercise.length;
-      data.log = exercise;
+      data.log = exercise.map(d => (d.date = d.date.toDateString()));
       res.json(data);
     })
     .catch(err => res.status(500).json({ error: err }));
