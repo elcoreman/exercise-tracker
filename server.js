@@ -26,7 +26,7 @@ const UserModel = mongoose.model("UserModel", UserSchema);
 const ExerciseSchema = new mongoose.Schema({
   description: String,
   duration: Number,
-  date: String,
+  date: Date,
   userid: String,
   _id: { type: String, default: shortid.generate }
 });
@@ -86,12 +86,20 @@ app.get("/api/exercise/log", (req, res) => {
   if (!req.query.userId) res.status(400).send("unknown userId");
   UserModel.findOne({ _id: req.query.userId })
     .then(user => {
+    let query={};
+    query.userid = req.query.userId;
+    
+    if(req.query.from || req.query.from) {
+      query.date = {}
+      if(req.query.from) query.date
+    }
+      
+      date = airedAt: { $gte: '1987-10-19', $lte: '1987-10-26' }
       return Promise.all([
         { _id: req.query.userId, username: user.username },
-        ExerciseModel.find(
-          { userid: req.query.userId },
-          "-_id description duration date"
-        )
+        ExerciseModel.find(query)
+          .select("-_id description duration date")
+          .limit(Number(req.query.limit) ? Number(req.query.limit) : 0)
       ]);
     })
     .then(([data, exercise]) => {
